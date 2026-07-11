@@ -1,0 +1,25 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Select the Modbus connection the aerosmart unit is reached through and its two station addresses.",
+        "data": {
+          "connection_entry_id": "Modbus connection",
+          "unit_ventilation": "Ventilation unit",
+          "unit_heat_pump": "Heat pump unit"
+        },
+        "data_description": {
+          "connection_entry_id": "The Modbus connection this unit is reached through.",
+          "unit_ventilation": "The ventilation controller's Modbus station address (default 1).",
+          "unit_heat_pump": "The heat pump / hot water controller's Modbus station address (default 2)."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect. Check that the unit is reachable on the selected connection and both station addresses."
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  }
+}
