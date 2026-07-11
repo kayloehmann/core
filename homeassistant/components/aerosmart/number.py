@@ -34,6 +34,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         attribute="zeitspanne_function_heizung_plus",
         entity_registry_enabled_default=False,
         native_unit_of_measurement="min",
+        native_min_value=30,
+        native_max_value=240,
     ),
     AerosmartNumberEntityDescription(
         key="boost_functions_ventilation_sollwert_erhoehung_function_heizung_plus",
@@ -42,6 +44,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         attribute="sollwert_erhoehung_function_heizung_plus",
         entity_registry_enabled_default=False,
         native_unit_of_measurement="K",
+        native_min_value=0.3,
+        native_max_value=2.0,
     ),
     AerosmartNumberEntityDescription(
         key="boost_functions_ventilation_zeitspanne_function_party",
@@ -50,6 +54,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         attribute="zeitspanne_function_party",
         entity_registry_enabled_default=False,
         native_unit_of_measurement="min",
+        native_min_value=60,
+        native_max_value=240,
     ),
     AerosmartNumberEntityDescription(
         key="ventilation_erhoehung_luefterstufe_3",
@@ -58,6 +64,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         attribute="erhoehung_luefterstufe_3",
         entity_registry_enabled_default=False,
         native_unit_of_measurement="%",
+        native_min_value=30,
+        native_max_value=100,
     ),
     AerosmartNumberEntityDescription(
         key="ventilation_soll_volumenstrom_luefterstufe2",
@@ -66,6 +74,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         attribute="soll_volumenstrom_luefterstufe2",
         entity_registry_enabled_default=False,
         native_unit_of_measurement="m³/h",
+        native_min_value=40,
+        native_max_value=300,
     ),
     AerosmartNumberEntityDescription(
         key="room_temperature_temp_raumluft_soll",
@@ -74,6 +84,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         attribute="temp_raumluft_soll",
         entity_registry_enabled_default=False,
         native_unit_of_measurement="°C",
+        native_min_value=14.0,
+        native_max_value=26.0,
     ),
     AerosmartNumberEntityDescription(
         key="summer_bypass_sommerautomatik_schaltpunkt1",
@@ -81,6 +93,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="summer_bypass",
         attribute="sommerautomatik_schaltpunkt1",
         entity_registry_enabled_default=False,
+        native_min_value=0,
+        native_max_value=2400,
     ),
     AerosmartNumberEntityDescription(
         key="summer_bypass_sommerautomatik_schaltpunkt2",
@@ -88,6 +102,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="summer_bypass",
         attribute="sommerautomatik_schaltpunkt2",
         entity_registry_enabled_default=False,
+        native_min_value=0,
+        native_max_value=2400,
     ),
     AerosmartNumberEntityDescription(
         key="summer_bypass_sommerautomatik_schaltpunkt3",
@@ -95,6 +111,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="summer_bypass",
         attribute="sommerautomatik_schaltpunkt3",
         entity_registry_enabled_default=False,
+        native_min_value=0,
+        native_max_value=2400,
     ),
     AerosmartNumberEntityDescription(
         key="summer_bypass_sommerautomatik_schaltpunkt4",
@@ -102,6 +120,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="summer_bypass",
         attribute="sommerautomatik_schaltpunkt4",
         entity_registry_enabled_default=False,
+        native_min_value=0,
+        native_max_value=2400,
     ),
     AerosmartNumberEntityDescription(
         key="hot_water_heat_pump_wp_brauchwasser_soll_temp",
@@ -110,6 +130,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         attribute="wp_brauchwasser_soll_temp",
         entity_registry_enabled_default=False,
         native_unit_of_measurement="°C",
+        native_min_value=20.0,
+        native_max_value=55.0,
     ),
 )
 

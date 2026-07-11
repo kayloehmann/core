@@ -38,13 +38,6 @@ SWITCH_DESCRIPTIONS: tuple[AerosmartSwitchEntityDescription, ...] = (
         attribute="function_bad_plus",
         entity_registry_enabled_default=False,
     ),
-    AerosmartSwitchEntityDescription(
-        key="summer_bypass_function_sommerautomatik",
-        name="Funktion „Sommerautomatik“",
-        component="summer_bypass",
-        attribute="function_sommerautomatik",
-        entity_registry_enabled_default=False,
-    ),
 )
 
 

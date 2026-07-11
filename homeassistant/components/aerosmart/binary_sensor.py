@@ -221,6 +221,12 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[AerosmartBinarySensorEntityDescription, ...] =
         attribute="anforderung_sommerautomatik",
     ),
     AerosmartBinarySensorEntityDescription(
+        key="summer_bypass_function_sommerautomatik",
+        name="Funktion „Sommerautomatik“",
+        component="summer_bypass",
+        attribute="function_sommerautomatik",
+    ),
+    AerosmartBinarySensorEntityDescription(
         key="aggregate_fault_stoerung_summenstoerung",
         name="Störung: Summenstörung",
         component="aggregate_fault",
