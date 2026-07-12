@@ -9,10 +9,15 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .entity import AerosmartEntity
 from .coordinator import AerosmartConfigEntry
+from .entity import AerosmartEntity
+
+# Coordinator-based (all entities share one poll); parallel per-entity
+# writes to the same Modbus link would race, so keep this serialized.
+PARALLEL_UPDATES = 0
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -26,55 +31,57 @@ class AerosmartSensorEntityDescription(SensorEntityDescription):
 SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     AerosmartSensorEntityDescription(
         key="general_wochentag",
-        name="wochentag",
+        translation_key="general_wochentag",
         component="general",
         attribute="wochentag",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="general_software_version",
-        name="Software Version",
+        translation_key="general_software_version",
+        entity_category=EntityCategory.DIAGNOSTIC,
         component="general",
         attribute="software_version",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="general_device_type",
-        name="Gerätetyp",
+        translation_key="general_device_type",
+        entity_category=EntityCategory.DIAGNOSTIC,
         component="general",
         attribute="device_type",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="general_revisionstuer",
-        name="Revisionstüre",
+        translation_key="general_revisionstuer",
         component="general",
         attribute="revisionstuer",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="general_time",
-        name="Uhrzeit",
+        translation_key="general_time",
         component="general",
         attribute="time",
     ),
     AerosmartSensorEntityDescription(
         key="general_send_date_time",
-        name="Uhrzeit und Datum verschicken",
+        translation_key="general_send_date_time",
         component="general",
         attribute="send_date_time",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="general_date",
-        name="Datum",
+        translation_key="general_date",
         component="general",
         attribute="date",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_temp_aussenluft",
-        name="Temperatur Aussenluft",
+        translation_key="outside_temperature_temp_aussenluft",
         component="outside_temperature",
         attribute="temp_aussenluft",
         native_unit_of_measurement="°C",
@@ -83,7 +90,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_aussenluft_temp_beschattung",
-        name="Temperatur Aussenluft: Beschattung",
+        translation_key="outside_temperature_aussenluft_temp_beschattung",
         component="outside_temperature",
         attribute="aussenluft_temp_beschattung",
         native_unit_of_measurement="°C",
@@ -92,7 +99,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_aussenluft_temp_frostschutz",
-        name="Temperatur Außenluft: Frostschutz",
+        translation_key="outside_temperature_aussenluft_temp_frostschutz",
         component="outside_temperature",
         attribute="aussenluft_temp_frostschutz",
         native_unit_of_measurement="°C",
@@ -101,7 +108,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_aussenluft_temp_frostschutz_aus",
-        name="Temperatur Außenluft: Frostschutz aus",
+        translation_key="outside_temperature_aussenluft_temp_frostschutz_aus",
         component="outside_temperature",
         attribute="aussenluft_temp_frostschutz_aus",
         native_unit_of_measurement="°C",
@@ -110,7 +117,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_aussenluft_temp_frostschutz_ein",
-        name="Temperatur Außenluft: Frostschutz ein",
+        translation_key="outside_temperature_aussenluft_temp_frostschutz_ein",
         component="outside_temperature",
         attribute="aussenluft_temp_frostschutz_ein",
         native_unit_of_measurement="°C",
@@ -119,7 +126,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_aussenluft_temp_reduktion_luftmenge_10_percent",
-        name="Temperatur Außenluft: Reduktion Luftmenge 10%",
+        translation_key="outside_temperature_aussenluft_temp_reduktion_luftmenge_10_percent",
         component="outside_temperature",
         attribute="aussenluft_temp_reduktion_luftmenge_10_percent",
         native_unit_of_measurement="°C",
@@ -128,7 +135,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_aussenluft_temp_reduktion_luftmenge_20_percent",
-        name="Temperatur Außenluft: Reduktion Luftmenge 20%",
+        translation_key="outside_temperature_aussenluft_temp_reduktion_luftmenge_20_percent",
         component="outside_temperature",
         attribute="aussenluft_temp_reduktion_luftmenge_20_percent",
         native_unit_of_measurement="°C",
@@ -137,7 +144,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_aussenluft_temp_sommerautomatik_aktivieren",
-        name="Temperatur Außenluft: Sommerautomatik aktivieren",
+        translation_key="outside_temperature_aussenluft_temp_sommerautomatik_aktivieren",
         component="outside_temperature",
         attribute="aussenluft_temp_sommerautomatik_aktivieren",
         native_unit_of_measurement="°C",
@@ -146,7 +153,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_aussenluft_temp_sommerautomatik_deaktivieren",
-        name="Temperatur Außenluft: Sommerautomatik deaktivieren",
+        translation_key="outside_temperature_aussenluft_temp_sommerautomatik_deaktivieren",
         component="outside_temperature",
         attribute="aussenluft_temp_sommerautomatik_deaktivieren",
         native_unit_of_measurement="°C",
@@ -155,7 +162,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_aussenluft_temp_sole_nach_aussenluftvorwaermung",
-        name="Temperatur: Sole nach Außenluftvorwärmung",
+        translation_key="outside_temperature_aussenluft_temp_sole_nach_aussenluftvorwaermung",
         component="outside_temperature",
         attribute="aussenluft_temp_sole_nach_aussenluftvorwaermung",
         native_unit_of_measurement="°C",
@@ -164,7 +171,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_aussenluft_temp_schwelle_heizen_kuehlen",
-        name="Temperaturschwelle Außenluft \\\\ Heizen / Kühlen",
+        translation_key="outside_temperature_aussenluft_temp_schwelle_heizen_kuehlen",
         component="outside_temperature",
         attribute="aussenluft_temp_schwelle_heizen_kuehlen",
         native_unit_of_measurement="°C",
@@ -173,14 +180,14 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_vereisungsschutz",
-        name="Vereisungsschutz",
+        translation_key="outside_temperature_vereisungsschutz",
         component="outside_temperature",
         attribute="vereisungsschutz",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="outside_temperature_betriebsstunden_sole_kreis_aussenluft",
-        name="Betriebsstunden Solekreis Außenluft",
+        translation_key="outside_temperature_betriebsstunden_sole_kreis_aussenluft",
         component="outside_temperature",
         attribute="betriebsstunden_sole_kreis_aussenluft",
         native_unit_of_measurement="h",
@@ -189,14 +196,14 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="carbon_dioxide_co2_measurement",
-        name="CO2-Messung",
+        translation_key="carbon_dioxide_co2_measurement",
         component="carbon_dioxide",
         attribute="co2_measurement",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="carbon_dioxide_co2",
-        name="CO2",
+        translation_key="carbon_dioxide_co2",
         component="carbon_dioxide",
         attribute="co2",
         native_unit_of_measurement="ppm",
@@ -204,7 +211,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="fine_dust_filter_feinstaubfilter_standzeit",
-        name="Feinstaubfilter Standzeit",
+        translation_key="fine_dust_filter_feinstaubfilter_standzeit",
         component="fine_dust_filter",
         attribute="feinstaubfilter_standzeit",
         native_unit_of_measurement="h",
@@ -213,7 +220,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="fine_dust_filter_betriebsstunden_feinstaubfilter",
-        name="betriebsstunden_feinstaubfilter",
+        translation_key="fine_dust_filter_betriebsstunden_feinstaubfilter",
         component="fine_dust_filter",
         attribute="betriebsstunden_feinstaubfilter",
         native_unit_of_measurement="h",
@@ -222,7 +229,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="coarse_dust_filter_betriebsstunden_grobstaubfilter",
-        name="betriebsstunden_grobstaubfilter",
+        translation_key="coarse_dust_filter_betriebsstunden_grobstaubfilter",
         component="coarse_dust_filter",
         attribute="betriebsstunden_grobstaubfilter",
         native_unit_of_measurement="h",
@@ -231,7 +238,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="coarse_dust_filter_grobstaubfilter_standzeit",
-        name="Grobstaubfilter Standzeit",
+        translation_key="coarse_dust_filter_grobstaubfilter_standzeit",
         component="coarse_dust_filter",
         attribute="grobstaubfilter_standzeit",
         native_unit_of_measurement="h",
@@ -240,14 +247,14 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="coarse_dust_filter_grobstaubfilter_betriebsart_filterueberwachung",
-        name="Grobstaubfilter: Betriebsart Filterüberwachung",
+        translation_key="coarse_dust_filter_grobstaubfilter_betriebsart_filterueberwachung",
         component="coarse_dust_filter",
         attribute="grobstaubfilter_betriebsart_filterueberwachung",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="coarse_dust_filter_grobstaubfilter_max_foerdervolume",
-        name="Grobstaubfilter: Maximales Fördervolumen",
+        translation_key="coarse_dust_filter_grobstaubfilter_max_foerdervolume",
         component="coarse_dust_filter",
         attribute="grobstaubfilter_max_foerdervolume",
         native_unit_of_measurement="m³",
@@ -255,7 +262,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="cooling_aussenluft_temp_kuehlung_aus",
-        name="Temperatur Außenluft: Kühlung aus",
+        translation_key="cooling_aussenluft_temp_kuehlung_aus",
         component="cooling",
         attribute="aussenluft_temp_kuehlung_aus",
         native_unit_of_measurement="°C",
@@ -264,7 +271,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="cooling_aussenluft_temp_kuehlung_ein",
-        name="Temperatur Außenluft: Kühlung ein",
+        translation_key="cooling_aussenluft_temp_kuehlung_ein",
         component="cooling",
         attribute="aussenluft_temp_kuehlung_ein",
         native_unit_of_measurement="°C",
@@ -273,7 +280,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_absenkung_aktive_luefterstufe",
-        name="Absenkung der Lüfterstufe 1",
+        translation_key="ventilation_absenkung_aktive_luefterstufe",
         component="ventilation",
         attribute="absenkung_aktive_luefterstufe",
         native_unit_of_measurement="%",
@@ -281,21 +288,21 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_aktive_luefterstufe",
-        name="Aktive Lüfterstufe",
+        translation_key="ventilation_aktive_luefterstufe",
         component="ventilation",
         attribute="aktive_luefterstufe",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_betriebsart",
-        name="Betriebsart",
+        translation_key="ventilation_betriebsart",
         component="ventilation",
         attribute="betriebsart",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_betriebsstunden_beschattung",
-        name="betriebsstunden_beschattung",
+        translation_key="ventilation_betriebsstunden_beschattung",
         component="ventilation",
         attribute="betriebsstunden_beschattung",
         native_unit_of_measurement="h",
@@ -304,7 +311,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_betriebsstunden_frostschutzeinrichtung",
-        name="betriebsstunden_frostschutzeinrichtung",
+        translation_key="ventilation_betriebsstunden_frostschutzeinrichtung",
         component="ventilation",
         attribute="betriebsstunden_frostschutzeinrichtung",
         native_unit_of_measurement="h",
@@ -313,7 +320,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_betriebsstunden_heizstufe1",
-        name="betriebsstunden_heizstufe1",
+        translation_key="ventilation_betriebsstunden_heizstufe1",
         component="ventilation",
         attribute="betriebsstunden_heizstufe1",
         native_unit_of_measurement="h",
@@ -322,7 +329,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_betriebsstunden_heizstufe2",
-        name="betriebsstunden_heizstufe2",
+        translation_key="ventilation_betriebsstunden_heizstufe2",
         component="ventilation",
         attribute="betriebsstunden_heizstufe2",
         native_unit_of_measurement="h",
@@ -331,7 +338,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_betriebsstunden_luefterstufe0",
-        name="betriebsstunden_luefterstufe0",
+        translation_key="ventilation_betriebsstunden_luefterstufe0",
         component="ventilation",
         attribute="betriebsstunden_luefterstufe0",
         native_unit_of_measurement="h",
@@ -340,7 +347,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_betriebsstunden_luefterstufe1",
-        name="betriebsstunden_luefterstufe1",
+        translation_key="ventilation_betriebsstunden_luefterstufe1",
         component="ventilation",
         attribute="betriebsstunden_luefterstufe1",
         native_unit_of_measurement="h",
@@ -349,7 +356,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_betriebsstunden_luefterstufe2",
-        name="betriebsstunden_luefterstufe2",
+        translation_key="ventilation_betriebsstunden_luefterstufe2",
         component="ventilation",
         attribute="betriebsstunden_luefterstufe2",
         native_unit_of_measurement="h",
@@ -358,7 +365,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_betriebsstunden_luefterstufe3",
-        name="betriebsstunden_luefterstufe3",
+        translation_key="ventilation_betriebsstunden_luefterstufe3",
         component="ventilation",
         attribute="betriebsstunden_luefterstufe3",
         native_unit_of_measurement="h",
@@ -367,14 +374,14 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_beschattungsfunktion",
-        name="Beschattungsfunktion",
+        translation_key="ventilation_beschattungsfunktion",
         component="ventilation",
         attribute="beschattungsfunktion",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_befoerderte_kubikmeter",
-        name="Gesamt beförderte Kubikmeter",
+        translation_key="ventilation_befoerderte_kubikmeter",
         component="ventilation",
         attribute="befoerderte_kubikmeter",
         native_unit_of_measurement="m³",
@@ -382,7 +389,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_befoerderte_luftmenge_seit_filterwechsel",
-        name="Gesamt beförderte Luftmenge seit Filterwechsel",
+        translation_key="ventilation_befoerderte_luftmenge_seit_filterwechsel",
         component="ventilation",
         attribute="befoerderte_luftmenge_seit_filterwechsel",
         native_unit_of_measurement="m³",
@@ -390,7 +397,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_soll_volumenstrom_abluft",
-        name="Soll-Volumenstrom Abluft",
+        translation_key="ventilation_soll_volumenstrom_abluft",
         component="ventilation",
         attribute="soll_volumenstrom_abluft",
         native_unit_of_measurement="m³",
@@ -398,7 +405,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_soll_volumenstrom_zuluft",
-        name="Soll-Volumenstrom Zuluft",
+        translation_key="ventilation_soll_volumenstrom_zuluft",
         component="ventilation",
         attribute="soll_volumenstrom_zuluft",
         native_unit_of_measurement="m³",
@@ -406,7 +413,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="ventilation_volumenstrombalance_zuluftabluft",
-        name="Volumenstrombalance ZuluftAbluft",
+        translation_key="ventilation_volumenstrombalance_zuluftabluft",
         component="ventilation",
         attribute="volumenstrombalance_zuluftabluft",
         native_unit_of_measurement="%",
@@ -414,7 +421,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="room_temperature_temp_raumluft",
-        name="Temperatur Raumluft",
+        translation_key="room_temperature_temp_raumluft",
         component="room_temperature",
         attribute="temp_raumluft",
         native_unit_of_measurement="°C",
@@ -423,7 +430,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="room_temperature_raum_temp_beschattung",
-        name="Temperatur Raum Beschattung",
+        translation_key="room_temperature_raum_temp_beschattung",
         component="room_temperature",
         attribute="raum_temp_beschattung",
         native_unit_of_measurement="°C",
@@ -432,14 +439,14 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="summer_bypass_betriebsart_sommerautomatik",
-        name="Betriebsart Sommerautomatik",
+        translation_key="summer_bypass_betriebsart_sommerautomatik",
         component="summer_bypass",
         attribute="betriebsart_sommerautomatik",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="fans_ist_ventilator_zuluft",
-        name="ist_ventilator_zuluft",
+        translation_key="fans_ist_ventilator_zuluft",
         component="fans",
         attribute="ist_ventilator_zuluft",
         native_unit_of_measurement="rpm",
@@ -447,7 +454,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="fans_ist_ventilator_abluft",
-        name="ist_ventilator_abluft",
+        translation_key="fans_ist_ventilator_abluft",
         component="fans",
         attribute="ist_ventilator_abluft",
         native_unit_of_measurement="rpm",
@@ -455,7 +462,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="fans_betriebsstunden_abluftventilator",
-        name="betriebsstunden_abluftventilator",
+        translation_key="fans_betriebsstunden_abluftventilator",
         component="fans",
         attribute="betriebsstunden_abluftventilator",
         native_unit_of_measurement="h",
@@ -464,7 +471,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="fans_betriebsstunden_zuluftventilator",
-        name="betriebsstunden_zuluftventilator",
+        translation_key="fans_betriebsstunden_zuluftventilator",
         component="fans",
         attribute="betriebsstunden_zuluftventilator",
         native_unit_of_measurement="h",
@@ -473,21 +480,21 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="fans_drehzahl_abluftventilator",
-        name="Drehzahl Abluftventilator",
+        translation_key="fans_drehzahl_abluftventilator",
         component="fans",
         attribute="drehzahl_abluftventilator",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="fans_drehzahl_zuluftventilator",
-        name="Drehzahl Zuluftventilator",
+        translation_key="fans_drehzahl_zuluftventilator",
         component="fans",
         attribute="drehzahl_zuluftventilator",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="fans_max_permissible_exhaust_air_fan_speed",
-        name="Maximal zulässige Drehzahl Abluftventilator",
+        translation_key="fans_max_permissible_exhaust_air_fan_speed",
         component="fans",
         attribute="max_permissible_exhaust_air_fan_speed",
         native_unit_of_measurement="1/min",
@@ -495,7 +502,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="fans_max_permissible_supply_air_fan_speed",
-        name="Maximal zulässige Drehzahl Zuluftventilator",
+        translation_key="fans_max_permissible_supply_air_fan_speed",
         component="fans",
         attribute="max_permissible_supply_air_fan_speed",
         native_unit_of_measurement="1/min",
@@ -503,14 +510,14 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="heat_pump_waermepumpe",
-        name="Wärmepumpe",
+        translation_key="heat_pump_waermepumpe",
         component="heat_pump",
         attribute="waermepumpe",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="heat_pump_wp_verdamperregister",
-        name="Verdampferregister",
+        translation_key="heat_pump_wp_verdamperregister",
         component="heat_pump",
         attribute="wp_verdamperregister",
         native_unit_of_measurement="°C",
@@ -519,14 +526,15 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="heat_pump_wp_zentralgeraet_adresse",
-        name="Zentralgerät Adresse (WP)",
+        translation_key="heat_pump_wp_zentralgeraet_adresse",
+        entity_category=EntityCategory.DIAGNOSTIC,
         component="heat_pump",
         attribute="wp_zentralgeraet_adresse",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="heat_pump_wp_betriebsstunden_kompressormotor",
-        name="Betriebsstunden: Kompressormotor",
+        translation_key="heat_pump_wp_betriebsstunden_kompressormotor",
         component="heat_pump",
         attribute="wp_betriebsstunden_kompressormotor",
         native_unit_of_measurement="h",
@@ -535,7 +543,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="heat_pump_wp_betriebsstunden_magnetventil_fluessiggas",
-        name="Betriebsstunden: Magnetventil Flüssiggas",
+        translation_key="heat_pump_wp_betriebsstunden_magnetventil_fluessiggas",
         component="heat_pump",
         attribute="wp_betriebsstunden_magnetventil_fluessiggas",
         native_unit_of_measurement="h",
@@ -544,7 +552,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="heat_pump_wp_betriebsstunden_magnetventil_heissgas",
-        name="Betriebsstunden: Magnetventil Heißgas",
+        translation_key="heat_pump_wp_betriebsstunden_magnetventil_heissgas",
         component="heat_pump",
         attribute="wp_betriebsstunden_magnetventil_heissgas",
         native_unit_of_measurement="h",
@@ -553,7 +561,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="heat_pump_wp_betriebsstunden_magnetventil_luftkondensator",
-        name="Betriebsstunden: Magnetventil Luftkondensator",
+        translation_key="heat_pump_wp_betriebsstunden_magnetventil_luftkondensator",
         component="heat_pump",
         attribute="wp_betriebsstunden_magnetventil_luftkondensator",
         native_unit_of_measurement="h",
@@ -562,31 +570,31 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="heat_pump_wp_hochdruck",
-        name="Hochdruck Wärmepumpe",
+        translation_key="heat_pump_wp_hochdruck",
         component="heat_pump",
         attribute="wp_hochdruck",
     ),
     AerosmartSensorEntityDescription(
         key="heat_pump_wp_niederdruck",
-        name="Niederdruck Wärmepumpe",
+        translation_key="heat_pump_wp_niederdruck",
         component="heat_pump",
         attribute="wp_niederdruck",
     ),
     AerosmartSensorEntityDescription(
         key="heat_pump_wp_status",
-        name="Status Wärmepumpe",
+        translation_key="heat_pump_wp_status",
         component="heat_pump",
         attribute="wp_status",
     ),
     AerosmartSensorEntityDescription(
         key="heat_pump_wp_status_restlaufzeit",
-        name="Status Wärmepumpe (Restzeit des aktuellen Status)",
+        translation_key="heat_pump_wp_status_restlaufzeit",
         component="heat_pump",
         attribute="wp_status_restlaufzeit",
     ),
     AerosmartSensorEntityDescription(
         key="hot_water_heat_pump_warmwasser_speicher_oben",
-        name="Temperatur: Warmwasserspeicher oben (T_BW_EHZ)",
+        translation_key="hot_water_heat_pump_warmwasser_speicher_oben",
         component="hot_water_heat_pump",
         attribute="warmwasser_speicher_oben",
         native_unit_of_measurement="°C",
@@ -595,7 +603,7 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="hot_water_heat_pump_warmwasser_warmepumpe",
-        name="Temperatur: Warmwasserspeicher Wärmepumpe (T_BW_WP)",
+        translation_key="hot_water_heat_pump_warmwasser_warmepumpe",
         component="hot_water_heat_pump",
         attribute="warmwasser_warmepumpe",
         native_unit_of_measurement="°C",
@@ -604,21 +612,21 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="hot_water_heat_pump_ueberschreitung_boilertemp",
-        name="Überschreitung Boilertemperatur",
+        translation_key="hot_water_heat_pump_ueberschreitung_boilertemp",
         component="hot_water_heat_pump",
         attribute="ueberschreitung_boilertemp",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="hot_water_heat_pump_wp_vorruebergehende_boilertemperatur",
-        name="Vorübergehende Boilerübertemperatur",
+        translation_key="hot_water_heat_pump_wp_vorruebergehende_boilertemperatur",
         component="hot_water_heat_pump",
         attribute="wp_vorruebergehende_boilertemperatur",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="hot_water_heat_pump_wp_brauchwasser_temp_raumheizungssperre",
-        name="Brauchwassertemperatur: Raumheizungssperre",
+        translation_key="hot_water_heat_pump_wp_brauchwasser_temp_raumheizungssperre",
         component="hot_water_heat_pump",
         attribute="wp_brauchwasser_temp_raumheizungssperre",
         native_unit_of_measurement="°C",
@@ -627,14 +635,14 @@ SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
     ),
     AerosmartSensorEntityDescription(
         key="hot_water_heat_pump_wp_verzoegerung_brauchwasserheizung",
-        name="Verzögerung Brauchwassererheizung",
+        translation_key="hot_water_heat_pump_wp_verzoegerung_brauchwasserheizung",
         component="hot_water_heat_pump",
         attribute="wp_verzoegerung_brauchwasserheizung",
         state_class=SensorStateClass.MEASUREMENT,
     ),
     AerosmartSensorEntityDescription(
         key="hot_water_heat_pump_wp_betriebsstunden_elektroheizstab",
-        name="Betriebsstunden: Elektroheizstab",
+        translation_key="hot_water_heat_pump_wp_betriebsstunden_elektroheizstab",
         component="hot_water_heat_pump",
         attribute="wp_betriebsstunden_elektroheizstab",
         native_unit_of_measurement="h",
@@ -652,8 +660,7 @@ async def async_setup_entry(
     """Set up aerosmart sensors."""
     coordinator = entry.runtime_data
     async_add_entities(
-        AerosmartSensor(coordinator, description)
-        for description in SENSOR_DESCRIPTIONS
+        AerosmartSensor(coordinator, description) for description in SENSOR_DESCRIPTIONS
     )
 
 

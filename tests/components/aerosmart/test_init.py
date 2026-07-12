@@ -38,9 +38,7 @@ async def test_reloads_on_connection_lost(
     assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
     await hass.async_block_till_done()
 
-    with patch.object(
-        hass.config_entries, "async_schedule_reload"
-    ) as schedule_reload:
+    with patch.object(hass.config_entries, "async_schedule_reload") as schedule_reload:
         mock_modbus_connection.simulate_connection_lost()
         await hass.async_block_till_done()
 

@@ -7,15 +7,16 @@ verified against the real unit before being relied on.
 
 from dataclasses import dataclass
 
-from homeassistant.components.number import (
-    NumberEntity,
-    NumberEntityDescription,
-)
+from homeassistant.components.number import NumberEntity, NumberEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .entity import AerosmartEntity
 from .coordinator import AerosmartConfigEntry
+from .entity import AerosmartEntity
+
+# Coordinator-based (all entities share one poll); parallel per-entity
+# writes to the same Modbus link would race, so keep this serialized.
+PARALLEL_UPDATES = 0
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -29,7 +30,7 @@ class AerosmartNumberEntityDescription(NumberEntityDescription):
 NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
     AerosmartNumberEntityDescription(
         key="boost_functions_ventilation_zeitspanne_function_heizung_plus",
-        name="Zeitspanne Funktion HEIZUNG+",
+        translation_key="boost_functions_ventilation_zeitspanne_function_heizung_plus",
         component="boost_functions_ventilation",
         attribute="zeitspanne_function_heizung_plus",
         entity_registry_enabled_default=False,
@@ -39,7 +40,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
     ),
     AerosmartNumberEntityDescription(
         key="boost_functions_ventilation_sollwert_erhoehung_function_heizung_plus",
-        name="Sollwert-Erhöhung Funktion HEIZUNG+",
+        translation_key="boost_functions_ventilation_sollwert_erhoehung_function_heizung_plus",
         component="boost_functions_ventilation",
         attribute="sollwert_erhoehung_function_heizung_plus",
         entity_registry_enabled_default=False,
@@ -49,7 +50,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
     ),
     AerosmartNumberEntityDescription(
         key="boost_functions_ventilation_zeitspanne_function_party",
-        name="Zeitspanne Funktion PARTY",
+        translation_key="boost_functions_ventilation_zeitspanne_function_party",
         component="boost_functions_ventilation",
         attribute="zeitspanne_function_party",
         entity_registry_enabled_default=False,
@@ -59,7 +60,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
     ),
     AerosmartNumberEntityDescription(
         key="ventilation_erhoehung_luefterstufe_3",
-        name="Erhöhung der Lüfterstufe 3 (R/W)",
+        translation_key="ventilation_erhoehung_luefterstufe_3",
         component="ventilation",
         attribute="erhoehung_luefterstufe_3",
         entity_registry_enabled_default=False,
@@ -69,7 +70,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
     ),
     AerosmartNumberEntityDescription(
         key="ventilation_soll_volumenstrom_luefterstufe2",
-        name="Soll-Volumenstrom Lüfterstufe 2 (read/write)",
+        translation_key="ventilation_soll_volumenstrom_luefterstufe2",
         component="ventilation",
         attribute="soll_volumenstrom_luefterstufe2",
         entity_registry_enabled_default=False,
@@ -79,7 +80,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
     ),
     AerosmartNumberEntityDescription(
         key="room_temperature_temp_raumluft_soll",
-        name="Temperatur Raumluft Soll",
+        translation_key="room_temperature_temp_raumluft_soll",
         component="room_temperature",
         attribute="temp_raumluft_soll",
         entity_registry_enabled_default=False,
@@ -89,7 +90,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
     ),
     AerosmartNumberEntityDescription(
         key="summer_bypass_sommerautomatik_schaltpunkt1",
-        name="Sommerautomatik Schaltpunkt 1",
+        translation_key="summer_bypass_sommerautomatik_schaltpunkt1",
         component="summer_bypass",
         attribute="sommerautomatik_schaltpunkt1",
         entity_registry_enabled_default=False,
@@ -98,7 +99,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
     ),
     AerosmartNumberEntityDescription(
         key="summer_bypass_sommerautomatik_schaltpunkt2",
-        name="Sommerautomatik Schaltpunkt 2",
+        translation_key="summer_bypass_sommerautomatik_schaltpunkt2",
         component="summer_bypass",
         attribute="sommerautomatik_schaltpunkt2",
         entity_registry_enabled_default=False,
@@ -107,7 +108,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
     ),
     AerosmartNumberEntityDescription(
         key="summer_bypass_sommerautomatik_schaltpunkt3",
-        name="Sommerautomatik Schaltpunkt 3",
+        translation_key="summer_bypass_sommerautomatik_schaltpunkt3",
         component="summer_bypass",
         attribute="sommerautomatik_schaltpunkt3",
         entity_registry_enabled_default=False,
@@ -116,7 +117,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
     ),
     AerosmartNumberEntityDescription(
         key="summer_bypass_sommerautomatik_schaltpunkt4",
-        name="Sommerautomatik Schaltpunkt 4",
+        translation_key="summer_bypass_sommerautomatik_schaltpunkt4",
         component="summer_bypass",
         attribute="sommerautomatik_schaltpunkt4",
         entity_registry_enabled_default=False,
@@ -125,7 +126,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
     ),
     AerosmartNumberEntityDescription(
         key="hot_water_heat_pump_wp_brauchwasser_soll_temp",
-        name="Brauchwasser Solltemperatur",
+        translation_key="hot_water_heat_pump_wp_brauchwasser_soll_temp",
         component="hot_water_heat_pump",
         attribute="wp_brauchwasser_soll_temp",
         entity_registry_enabled_default=False,
@@ -144,8 +145,7 @@ async def async_setup_entry(
     """Set up aerosmart numbers."""
     coordinator = entry.runtime_data
     async_add_entities(
-        AerosmartNumber(coordinator, description)
-        for description in NUMBER_DESCRIPTIONS
+        AerosmartNumber(coordinator, description) for description in NUMBER_DESCRIPTIONS
     )
 
 

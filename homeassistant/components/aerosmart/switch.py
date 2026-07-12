@@ -6,13 +6,18 @@ verified against the real unit before being relied on.
 """
 
 from dataclasses import dataclass
+from typing import Any
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from .entity import AerosmartEntity
 from .coordinator import AerosmartConfigEntry
+from .entity import AerosmartEntity
+
+# Coordinator-based (all entities share one poll); parallel per-entity
+# writes to the same Modbus link would race, so keep this serialized.
+PARALLEL_UPDATES = 0
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -26,14 +31,14 @@ class AerosmartSwitchEntityDescription(SwitchEntityDescription):
 SWITCH_DESCRIPTIONS: tuple[AerosmartSwitchEntityDescription, ...] = (
     AerosmartSwitchEntityDescription(
         key="boost_functions_ventilation_function_heizung_plus",
-        name="Funktion HEIZUNG+",
+        translation_key="boost_functions_ventilation_function_heizung_plus",
         component="boost_functions_ventilation",
         attribute="function_heizung_plus",
         entity_registry_enabled_default=False,
     ),
     AerosmartSwitchEntityDescription(
         key="boost_functions_heat_pump_function_bad_plus",
-        name="Funktion BAD+",
+        translation_key="boost_functions_heat_pump_function_bad_plus",
         component="boost_functions_heat_pump",
         attribute="function_bad_plus",
         entity_registry_enabled_default=False,
@@ -49,8 +54,7 @@ async def async_setup_entry(
     """Set up aerosmart switches."""
     coordinator = entry.runtime_data
     async_add_entities(
-        AerosmartSwitch(coordinator, description)
-        for description in SWITCH_DESCRIPTIONS
+        AerosmartSwitch(coordinator, description) for description in SWITCH_DESCRIPTIONS
     )
 
 
@@ -65,12 +69,12 @@ class AerosmartSwitch(AerosmartEntity, SwitchEntity):
         value = getattr(self._subsystem, self.entity_description.attribute)
         return None if value is None else bool(value)
 
-    async def async_turn_on(self, **kwargs) -> None:
+    async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the function on."""
         await self._subsystem.write(self.entity_description.attribute, 1)
         await self.coordinator.async_request_refresh()
 
-    async def async_turn_off(self, **kwargs) -> None:
+    async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the function off."""
         await self._subsystem.write(self.entity_description.attribute, 0)
         await self.coordinator.async_request_refresh()

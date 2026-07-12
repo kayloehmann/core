@@ -15,6 +15,10 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from .coordinator import AerosmartConfigEntry, AerosmartCoordinator
 from .entity import AerosmartEntity
 
+# Coordinator-based (all entities share one poll); parallel per-entity
+# writes to the same Modbus link would race, so keep this serialized.
+PARALLEL_UPDATES = 0
+
 
 @dataclass(frozen=True, kw_only=True)
 class AerosmartSelectEntityDescription(SelectEntityDescription):
@@ -27,7 +31,7 @@ class AerosmartSelectEntityDescription(SelectEntityDescription):
 SELECT_DESCRIPTIONS: tuple[AerosmartSelectEntityDescription, ...] = (
     AerosmartSelectEntityDescription(
         key="ventilation_betriebsart",
-        name="Betriebsart",
+        translation_key="ventilation_betriebsart",
         component="ventilation",
         attribute="betriebsart",
         entity_registry_enabled_default=False,

@@ -70,3 +70,113 @@ async def test_cannot_connect(
 
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": "cannot_connect"}
+
+
+@pytest.mark.usefixtures("mock_modbus_unit_ventilation", "mock_modbus_unit_heat_pump")
+async def test_duplicate_entry(
+    hass: HomeAssistant,
+    connection_entry: MockConfigEntry,
+    mock_config_entry: MockConfigEntry,
+) -> None:
+    """The same connection and both unit IDs abort as already configured."""
+    mock_config_entry.add_to_hass(hass)
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_CONNECTION: connection_entry.entry_id,
+            CONF_UNIT_VENTILATION: 1,
+            CONF_UNIT_HEAT_PUMP: 2,
+        },
+    )
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
+
+
+@pytest.mark.usefixtures("mock_modbus_unit_ventilation")
+async def test_reconfigure_success(
+    hass: HomeAssistant,
+    connection_entry: MockConfigEntry,
+    mock_config_entry: MockConfigEntry,
+) -> None:
+    """Reconfiguring to a different heat pump unit ID updates the entry."""
+    mock_config_entry.add_to_hass(hass)
+
+    result = await mock_config_entry.start_reconfigure_flow(hass)
+    assert result["type"] is FlowResultType.FORM
+    assert result["step_id"] == "reconfigure"
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_CONNECTION: connection_entry.entry_id,
+            CONF_UNIT_VENTILATION: 1,
+            CONF_UNIT_HEAT_PUMP: 3,
+        },
+    )
+    await hass.async_block_till_done()
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    assert mock_config_entry.data[CONF_UNIT_HEAT_PUMP] == 3
+
+
+async def test_reconfigure_cannot_connect(
+    hass: HomeAssistant,
+    connection_entry: MockConfigEntry,
+    mock_config_entry: MockConfigEntry,
+) -> None:
+    """An unreachable unit during reconfigure shows a form error."""
+    mock_config_entry.add_to_hass(hass)
+    await connection_entry.runtime_data.close()
+
+    result = await mock_config_entry.start_reconfigure_flow(hass)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_CONNECTION: connection_entry.entry_id,
+            CONF_UNIT_VENTILATION: 1,
+            CONF_UNIT_HEAT_PUMP: 2,
+        },
+    )
+
+    assert result["type"] is FlowResultType.FORM
+    assert result["errors"] == {"base": "cannot_connect"}
+
+
+@pytest.mark.usefixtures("mock_modbus_unit_ventilation", "mock_modbus_unit_heat_pump")
+async def test_reconfigure_duplicate(
+    hass: HomeAssistant,
+    connection_entry: MockConfigEntry,
+    mock_config_entry: MockConfigEntry,
+) -> None:
+    """Reconfiguring onto another entry's connection+units aborts as duplicate."""
+    mock_config_entry.add_to_hass(hass)
+    other_entry = MockConfigEntry(
+        domain=DOMAIN,
+        title="aerosmart",
+        unique_id=f"{connection_entry.entry_id}_9_10",
+        data={
+            CONF_CONNECTION: connection_entry.entry_id,
+            CONF_UNIT_VENTILATION: 9,
+            CONF_UNIT_HEAT_PUMP: 10,
+        },
+    )
+    other_entry.add_to_hass(hass)
+
+    result = await mock_config_entry.start_reconfigure_flow(hass)
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"],
+        {
+            CONF_CONNECTION: connection_entry.entry_id,
+            CONF_UNIT_VENTILATION: 9,
+            CONF_UNIT_HEAT_PUMP: 10,
+        },
+    )
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "already_configured"
