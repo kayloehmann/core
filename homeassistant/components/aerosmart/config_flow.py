@@ -1,6 +1,6 @@
 """Config flow for aerosmart."""
 
-from typing import Any
+from typing import Any, override
 
 from aerosmart_modbus import AerosmartDevice
 from modbus_connection import ModbusError
@@ -58,6 +58,7 @@ class AerosmartConfigFlow(ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
+    @override
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:

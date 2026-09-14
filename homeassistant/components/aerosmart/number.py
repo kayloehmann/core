@@ -6,13 +6,19 @@ verified against the real unit before being relied on.
 """
 
 from dataclasses import dataclass
+from typing import override
 
-from homeassistant.components.number import NumberEntity, NumberEntityDescription
+from homeassistant.components.number import (
+    NumberDeviceClass,
+    NumberEntity,
+    NumberEntityDescription,
+)
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import AerosmartConfigEntry
-from .entity import AerosmartEntity
+from .entity import AerosmartEntity, AerosmartEntityDescription
 
 # Coordinator-based (all entities share one poll); parallel per-entity
 # writes to the same Modbus link would race, so keep this serialized.
@@ -20,11 +26,10 @@ PARALLEL_UPDATES = 0
 
 
 @dataclass(frozen=True, kw_only=True)
-class AerosmartNumberEntityDescription(NumberEntityDescription):
+class AerosmartNumberEntityDescription(
+    NumberEntityDescription, AerosmartEntityDescription
+):
     """Describes an aerosmart number entity."""
-
-    component: str
-    attribute: str
 
 
 NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
@@ -34,6 +39,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="boost_functions_ventilation",
         attribute="zeitspanne_function_heizung_plus",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
         native_unit_of_measurement="min",
         native_min_value=30,
         native_max_value=240,
@@ -44,6 +50,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="boost_functions_ventilation",
         attribute="sollwert_erhoehung_function_heizung_plus",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
         native_unit_of_measurement="K",
         native_min_value=0.3,
         native_max_value=2.0,
@@ -54,6 +61,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="boost_functions_ventilation",
         attribute="zeitspanne_function_party",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
         native_unit_of_measurement="min",
         native_min_value=60,
         native_max_value=240,
@@ -64,6 +72,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="ventilation",
         attribute="erhoehung_luefterstufe_3",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
         native_unit_of_measurement="%",
         native_min_value=30,
         native_max_value=100,
@@ -74,6 +83,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="ventilation",
         attribute="soll_volumenstrom_luefterstufe2",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
         native_unit_of_measurement="m³/h",
         native_min_value=40,
         native_max_value=300,
@@ -84,6 +94,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="room_temperature",
         attribute="temp_raumluft_soll",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
+        device_class=NumberDeviceClass.TEMPERATURE,
         native_unit_of_measurement="°C",
         native_min_value=14.0,
         native_max_value=26.0,
@@ -94,6 +106,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="summer_bypass",
         attribute="sommerautomatik_schaltpunkt1",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
         native_min_value=0,
         native_max_value=2400,
     ),
@@ -103,6 +116,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="summer_bypass",
         attribute="sommerautomatik_schaltpunkt2",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
         native_min_value=0,
         native_max_value=2400,
     ),
@@ -112,6 +126,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="summer_bypass",
         attribute="sommerautomatik_schaltpunkt3",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
         native_min_value=0,
         native_max_value=2400,
     ),
@@ -121,6 +136,7 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="summer_bypass",
         attribute="sommerautomatik_schaltpunkt4",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
         native_min_value=0,
         native_max_value=2400,
     ),
@@ -130,6 +146,8 @@ NUMBER_DESCRIPTIONS: tuple[AerosmartNumberEntityDescription, ...] = (
         component="hot_water_heat_pump",
         attribute="wp_brauchwasser_soll_temp",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
+        device_class=NumberDeviceClass.TEMPERATURE,
         native_unit_of_measurement="°C",
         native_min_value=20.0,
         native_max_value=55.0,
@@ -155,10 +173,12 @@ class AerosmartNumber(AerosmartEntity, NumberEntity):
     entity_description: AerosmartNumberEntityDescription
 
     @property
+    @override
     def native_value(self) -> float | int | None:
         """Return the register's current value."""
         return getattr(self._subsystem, self.entity_description.attribute)
 
+    @override
     async def async_set_native_value(self, value: float) -> None:
         """Write the new setpoint and refresh."""
         await self._subsystem.write(self.entity_description.attribute, value)

@@ -7,13 +7,14 @@ automated.
 """
 
 from dataclasses import dataclass
+from typing import override
 
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import AerosmartConfigEntry, AerosmartCoordinator
-from .entity import AerosmartEntity
+from .entity import AerosmartEntity, AerosmartEntityDescription
 
 # Coordinator-based (all entities share one poll); parallel per-entity
 # writes to the same Modbus link would race, so keep this serialized.
@@ -21,11 +22,10 @@ PARALLEL_UPDATES = 0
 
 
 @dataclass(frozen=True, kw_only=True)
-class AerosmartSelectEntityDescription(SelectEntityDescription):
+class AerosmartSelectEntityDescription(
+    SelectEntityDescription, AerosmartEntityDescription
+):
     """Describes an aerosmart select entity."""
-
-    component: str
-    attribute: str
 
 
 SELECT_DESCRIPTIONS: tuple[AerosmartSelectEntityDescription, ...] = (
@@ -70,11 +70,13 @@ class AerosmartSelect(AerosmartEntity, SelectEntity):
         self._attr_options = list(self._label_to_code)
 
     @property
+    @override
     def current_option(self) -> str | None:
         """Return the register's current value as its documented label."""
         value = getattr(self._subsystem, self.entity_description.attribute)
         return None if value is None else self._code_to_label.get(int(value))
 
+    @override
     async def async_select_option(self, option: str) -> None:
         """Write the selected option's underlying enum code."""
         code = self._label_to_code[option]

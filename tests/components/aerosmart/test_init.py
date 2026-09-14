@@ -42,4 +42,23 @@ async def test_reloads_on_connection_lost(
         mock_modbus_connection.simulate_connection_lost()
         await hass.async_block_till_done()
 
-    schedule_reload.assert_called_once_with(mock_config_entry.entry_id)
+    # modbus_connection also reloads itself to rebuild the dropped connection,
+    # so aerosmart's own reload is one call among others, not the only one.
+    schedule_reload.assert_any_call(mock_config_entry.entry_id)
+
+
+async def test_coordinator_update_failure(
+    hass: HomeAssistant,
+    connection_entry: MockConfigEntry,
+    mock_config_entry: MockConfigEntry,
+) -> None:
+    """A Modbus error during a periodic refresh marks the update failed."""
+    mock_config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
+    await hass.async_block_till_done()
+
+    await connection_entry.runtime_data.close()
+    coordinator = mock_config_entry.runtime_data
+    await coordinator.async_refresh()
+
+    assert coordinator.last_update_success is False

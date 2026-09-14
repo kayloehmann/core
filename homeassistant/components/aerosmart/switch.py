@@ -6,14 +6,15 @@ verified against the real unit before being relied on.
 """
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, override
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import AerosmartConfigEntry
-from .entity import AerosmartEntity
+from .entity import AerosmartEntity, AerosmartEntityDescription
 
 # Coordinator-based (all entities share one poll); parallel per-entity
 # writes to the same Modbus link would race, so keep this serialized.
@@ -21,11 +22,10 @@ PARALLEL_UPDATES = 0
 
 
 @dataclass(frozen=True, kw_only=True)
-class AerosmartSwitchEntityDescription(SwitchEntityDescription):
+class AerosmartSwitchEntityDescription(
+    SwitchEntityDescription, AerosmartEntityDescription
+):
     """Describes an aerosmart switch entity."""
-
-    component: str
-    attribute: str
 
 
 SWITCH_DESCRIPTIONS: tuple[AerosmartSwitchEntityDescription, ...] = (
@@ -35,6 +35,7 @@ SWITCH_DESCRIPTIONS: tuple[AerosmartSwitchEntityDescription, ...] = (
         component="boost_functions_ventilation",
         attribute="function_heizung_plus",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
     ),
     AerosmartSwitchEntityDescription(
         key="boost_functions_heat_pump_function_bad_plus",
@@ -42,6 +43,7 @@ SWITCH_DESCRIPTIONS: tuple[AerosmartSwitchEntityDescription, ...] = (
         component="boost_functions_heat_pump",
         attribute="function_bad_plus",
         entity_registry_enabled_default=False,
+        entity_category=EntityCategory.CONFIG,
     ),
 )
 
@@ -64,16 +66,19 @@ class AerosmartSwitch(AerosmartEntity, SwitchEntity):
     entity_description: AerosmartSwitchEntityDescription
 
     @property
+    @override
     def is_on(self) -> bool | None:
         """Return True if the register's value is non-zero."""
         value = getattr(self._subsystem, self.entity_description.attribute)
         return None if value is None else bool(value)
 
+    @override
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the function on."""
         await self._subsystem.write(self.entity_description.attribute, 1)
         await self.coordinator.async_request_refresh()
 
+    @override
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the function off."""
         await self._subsystem.write(self.entity_description.attribute, 0)

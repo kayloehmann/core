@@ -1,6 +1,7 @@
 """DataUpdateCoordinator for aerosmart."""
 
 import logging
+from typing import override
 
 from aerosmart_modbus import AerosmartDevice
 from modbus_connection import ModbusError
@@ -24,6 +25,8 @@ class AerosmartCoordinator(DataUpdateCoordinator[AerosmartDevice]):
     ``modbus_connection`` entry owns the connection; this coordinator only reads.
     """
 
+    config_entry: AerosmartConfigEntry
+
     def __init__(
         self,
         hass: HomeAssistant,
@@ -40,6 +43,7 @@ class AerosmartCoordinator(DataUpdateCoordinator[AerosmartDevice]):
         )
         self.device = device
 
+    @override
     async def _async_update_data(self) -> AerosmartDevice:
         """Fetch the latest data from both aerosmart units."""
         try:

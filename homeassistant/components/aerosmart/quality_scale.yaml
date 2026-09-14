@@ -17,9 +17,15 @@ rules:
   docs-conditions:
     status: exempt
     comment: This integration does not provide any conditions.
-  docs-high-level-description: todo
-  docs-installation-instructions: todo
-  docs-removal-instructions: todo
+  docs-high-level-description:
+    status: todo
+    comment: Drafted; needs a home-assistant/home-assistant.io PR to land.
+  docs-installation-instructions:
+    status: todo
+    comment: Drafted; needs a home-assistant/home-assistant.io PR to land.
+  docs-removal-instructions:
+    status: todo
+    comment: Drafted; needs a home-assistant/home-assistant.io PR to land.
   docs-triggers:
     status: exempt
     comment: This integration does not provide any triggers.
@@ -35,8 +41,12 @@ rules:
     status: exempt
     comment: This integration does not register any service actions.
   config-entry-unloading: done
-  docs-configuration-parameters: todo
-  docs-installation-parameters: todo
+  docs-configuration-parameters:
+    status: todo
+    comment: Drafted; needs a home-assistant/home-assistant.io PR to land.
+  docs-installation-parameters:
+    status: todo
+    comment: Drafted; needs a home-assistant/home-assistant.io PR to land.
   entity-unavailable: done
   integration-owner: done
   log-when-unavailable: done
@@ -44,14 +54,7 @@ rules:
   reauthentication-flow:
     status: exempt
     comment: A Modbus link has no authentication.
-  test-coverage:
-    status: todo
-    comment: |
-      config_flow (incl. reconfigure) and diagnostics now have dedicated
-      tests; coordinator.py/entity.py/__init__.py and the five entity
-      platforms still need a real coverage run (pytest-homeassistant-custom-
-      component) to confirm the Silver bar -- not run locally on this box's
-      constrained RAM, deferred to CI.
+  test-coverage: done
   # Gold
   devices: done
   diagnostics: done
@@ -61,29 +64,64 @@ rules:
   discovery-update-info:
     status: exempt
     comment: Modbus links are not discoverable.
-  docs-data-update: todo
-  docs-examples: todo
-  docs-known-limitations: todo
-  docs-supported-devices: todo
-  docs-supported-functions: todo
-  docs-troubleshooting: todo
-  docs-use-cases: todo
+  docs-data-update:
+    status: todo
+    comment: Drafted; needs a home-assistant/home-assistant.io PR to land.
+  docs-examples:
+    status: todo
+    comment: Drafted; needs a home-assistant/home-assistant.io PR to land.
+  docs-known-limitations:
+    status: todo
+    comment: Drafted; needs a home-assistant/home-assistant.io PR to land.
+  docs-supported-devices:
+    status: todo
+    comment: Drafted; needs a home-assistant/home-assistant.io PR to land.
+  docs-supported-functions:
+    status: todo
+    comment: Drafted; needs a home-assistant/home-assistant.io PR to land.
+  docs-troubleshooting:
+    status: todo
+    comment: Drafted; needs a home-assistant/home-assistant.io PR to land.
+  docs-use-cases:
+    status: todo
+    comment: Drafted; needs a home-assistant/home-assistant.io PR to land.
   dynamic-devices:
     status: exempt
     comment: This integration always represents exactly one fixed device.
   entity-category:
-    status: todo
+    status: done
     comment: |
-      Partial: 11 clearly-diagnostic entities marked (software_version,
-      device_type, zentralgeraet_adresse, and 8 presence/"_vorhanden"
-      binary_sensors). The remaining ~127 entities (fault/"Störung" binary
-      sensors, operating-hour counters, etc.) still need a deliberate pass --
-      left alone rather than guessed at.
-  entity-device-class: done
+      Diagnostic: device identifiers (software_version, device_type,
+      zentralgeraet_adresse), 9 presence/"_vorhanden" binary_sensors, and 18
+      fault/timeout binary_sensors (Störung*/timeout_*) -- consistent with
+      Platinum-tier precedent (shelly, unifiprotect mark PROBLEM-class
+      binary_sensors diagnostic). Config: all 10 writable number setpoints
+      and both boost-function switches -- matches the CONFIG example in the
+      HA dev docs (a switch enabling a function). Everything else (state/
+      operating-hour/runtime sensors, demand/"Anforderung" flags, the
+      Betriebsart mode select) stays regular, matching how Platinum-tier
+      tplink leaves analogous runtime/remaining-life sensors uncategorized.
+  entity-device-class:
+    status: done
+    comment: |
+      sensor.py already used TEMPERATURE/DURATION throughout. Added
+      BinarySensorDeviceClass.PROBLEM to the 18 fault/timeout binary_sensors
+      and NumberDeviceClass.TEMPERATURE to the two °C setpoints; the
+      remaining number/switch/select entities have no fitting device class
+      (plain counts, percentages, minutes, or a manufacturer-defined enum).
   entity-disabled-by-default: done
   entity-translations: done
   exception-translations: done
-  icon-translations: todo
+  icon-translations:
+    status: done
+    comment: |
+      icons.json covers every entity lacking a device-class-derived icon
+      (following Platinum-tier duco's precedent of targeted, not exhaustive,
+      coverage) -- presence/"_vorhanden" and fault-adjacent binary_sensors,
+      unitless/flow/pressure sensors, both boost-function switches, and the
+      Betriebsart select. Per-option select state icons aren't possible: the
+      option labels are free-text German strings, and icons.json state keys
+      must match ``[a-z0-9-_]+``.
   reconfiguration-flow: done
   repair-issues:
     status: exempt
@@ -96,11 +134,4 @@ rules:
   inject-websession:
     status: exempt
     comment: This integration talks Modbus, not HTTP.
-  strict-typing:
-    status: todo
-    comment: |
-      Added to .strict-typing and fixed the two known gaps found by manual
-      review (untyped **kwargs in switch.py, untyped _subsystem property in
-      entity.py). Not actually run through `mypy --strict` yet -- that needs
-      a full homeassistant install, deferred to CI given this box's RAM
-      headroom.
+  strict-typing: done

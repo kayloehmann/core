@@ -113,6 +113,7 @@ def mock_config_entry(
     return MockConfigEntry(
         domain=DOMAIN,
         title="aerosmart",
+        unique_id=f"{connection_entry.entry_id}_{UNIT_VENTILATION}_{UNIT_HEAT_PUMP}",
         data={
             CONF_CONNECTION: connection_entry.entry_id,
             CONF_UNIT_VENTILATION: UNIT_VENTILATION,

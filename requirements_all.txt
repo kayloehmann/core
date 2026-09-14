@@ -150,6 +150,9 @@ adguardhome==0.8.1
 # homeassistant.components.advantage_air
 advantage-air==0.4.4
 
+# homeassistant.components.aerosmart
+aerosmart-modbus==0.2.1
+
 # homeassistant.components.frontier_silicon
 afsapi==1.0.1
 

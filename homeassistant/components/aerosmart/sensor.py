@@ -1,6 +1,7 @@
 """Sensor platform for aerosmart."""
 
 from dataclasses import dataclass
+from typing import override
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -8,12 +9,12 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from .coordinator import AerosmartConfigEntry
-from .entity import AerosmartEntity
+from .entity import AerosmartEntity, AerosmartEntityDescription
 
 # Coordinator-based (all entities share one poll); parallel per-entity
 # writes to the same Modbus link would race, so keep this serialized.
@@ -21,11 +22,10 @@ PARALLEL_UPDATES = 0
 
 
 @dataclass(frozen=True, kw_only=True)
-class AerosmartSensorEntityDescription(SensorEntityDescription):
+class AerosmartSensorEntityDescription(
+    SensorEntityDescription, AerosmartEntityDescription
+):
     """Describes an aerosmart sensor entity."""
-
-    component: str
-    attribute: str
 
 
 SENSOR_DESCRIPTIONS: tuple[AerosmartSensorEntityDescription, ...] = (
@@ -670,6 +670,7 @@ class AerosmartSensor(AerosmartEntity, SensorEntity):
     entity_description: AerosmartSensorEntityDescription
 
     @property
+    @override
     def native_value(self) -> float | int | None:
         """Return the register's current value."""
         return getattr(self._subsystem, self.entity_description.attribute)
