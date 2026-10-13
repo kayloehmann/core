@@ -17,11 +17,12 @@ from .const import (
     CONF_PARITY,
     CONF_STOPBITS,
     CONNECTION_SERIAL,
+    CONNECTION_TCP as CONNECTION_TCP,
     DOMAIN,
 )
 from .exceptions import ConnectionNotReady
 
-__all__ = ["ConnectionNotReady", "async_get_unit"]
+__all__ = ["CONNECTION_TCP", "DOMAIN", "ConnectionNotReady", "async_get_unit"]
 
 type ModbusConnectionConfigEntry = ConfigEntry[ModbusConnection]
 

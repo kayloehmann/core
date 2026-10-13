@@ -18,16 +18,17 @@ from .const import (
     CONF_CONNECTION,
     CONF_UNIT_HEAT_PUMP,
     CONF_UNIT_VENTILATION,
+    DOMAIN as DOMAIN,
     MESSAGE_SPACING_SECONDS,
 )
 from .coordinator import AerosmartConfigEntry, AerosmartCoordinator
 
 PLATFORMS: list[Platform] = [
-    Platform.SENSOR,
     Platform.BINARY_SENSOR,
     Platform.NUMBER,
-    Platform.SWITCH,
     Platform.SELECT,
+    Platform.SENSOR,
+    Platform.SWITCH,
 ]
 
 

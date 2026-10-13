@@ -12,13 +12,13 @@ from unittest.mock import AsyncMock, patch
 from modbus_connection.mock import MockModbusConnection, MockModbusUnit
 import pytest
 
-from homeassistant.components.aerosmart.const import (
+from homeassistant.components.aerosmart import (
     CONF_CONNECTION,
     CONF_UNIT_HEAT_PUMP,
     CONF_UNIT_VENTILATION,
     DOMAIN,
 )
-from homeassistant.components.modbus_connection.const import (
+from homeassistant.components.modbus_connection import (
     CONNECTION_TCP,
     DOMAIN as MODBUS_CONNECTION_DOMAIN,
 )

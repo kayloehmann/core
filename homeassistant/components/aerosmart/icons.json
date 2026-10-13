@@ -1,41 +1,8 @@
 {
   "entity": {
     "binary_sensor": {
-      "general_relaykontakt_ext_lu": {
-        "default": "mdi:electric-switch"
-      },
-      "outside_temperature_aussenluftfuehler_vorhanden": {
-        "default": "mdi:thermometer-check"
-      },
-      "fire_alarm_brandmeldealarm": {
-        "default": "mdi:fire-alert"
-      },
-      "fire_alarm_brandmeldealarm_vorhanden": {
-        "default": "mdi:fire-alert"
-      },
-      "fire_alarm_kontakt_brandmeldealarm": {
-        "default": "mdi:electric-switch"
-      },
       "carbon_dioxide_co2_sensor_available": {
         "default": "mdi:molecule-co2"
-      },
-      "utility_lockout_evu_vorhanden": {
-        "default": "mdi:transmission-tower"
-      },
-      "utility_lockout_evu_sperre_brauchwasser_aktiv": {
-        "default": "mdi:water-boiler-off"
-      },
-      "utility_lockout_evu_sperre_elektroheizstab_aktiv": {
-        "default": "mdi:radiator-off"
-      },
-      "utility_lockout_evu_sperre_raumheizung_aktiv": {
-        "default": "mdi:radiator-off"
-      },
-      "fine_dust_filter_feinstaubfilter_vorhanden": {
-        "default": "mdi:air-filter"
-      },
-      "fine_dust_filter_feinstaubfilter_wechseln": {
-        "default": "mdi:air-filter"
       },
       "coarse_dust_filter_grobstaubfilter_vorhanden": {
         "default": "mdi:air-filter"
@@ -46,14 +13,50 @@
       "cooling_kuehlung_vorhanden": {
         "default": "mdi:snowflake"
       },
-      "ventilation_anforderung_abtauen": {
-        "default": "mdi:snowflake-melt"
+      "fans_anforderung_ventilatoren_durch_waermepumpe": {
+        "default": "mdi:fan"
       },
-      "ventilation_anforderung_beschattung": {
-        "default": "mdi:blinds"
+      "fans_anforderung_ventilatoren_durch_zonenregelung": {
+        "default": "mdi:fan"
       },
-      "ventilation_anforderung_st3_ext": {
-        "default": "mdi:fan-plus"
+      "fine_dust_filter_feinstaubfilter_vorhanden": {
+        "default": "mdi:air-filter"
+      },
+      "fine_dust_filter_feinstaubfilter_wechseln": {
+        "default": "mdi:air-filter"
+      },
+      "fire_alarm_brandmeldealarm": {
+        "default": "mdi:fire-alert"
+      },
+      "fire_alarm_brandmeldealarm_vorhanden": {
+        "default": "mdi:fire-alert"
+      },
+      "fire_alarm_kontakt_brandmeldealarm": {
+        "default": "mdi:electric-switch"
+      },
+      "general_relaykontakt_ext_lu": {
+        "default": "mdi:electric-switch"
+      },
+      "heat_pump_wp_kontakt_evu": {
+        "default": "mdi:electric-switch"
+      },
+      "heat_pump_wp_relaiskontakt_ext": {
+        "default": "mdi:electric-switch"
+      },
+      "hot_water_heat_pump_wp_elektroheizstab_vorhanden": {
+        "default": "mdi:water-boiler"
+      },
+      "hot_water_ventilation_anforderung_brauchwasserheizung_elektroheizstab": {
+        "default": "mdi:water-boiler"
+      },
+      "hot_water_ventilation_anforderung_brauchwasserheizung_waermepumpe": {
+        "default": "mdi:water-boiler"
+      },
+      "hot_water_ventilation_anforderung_disbalance_boilerueberwaermung": {
+        "default": "mdi:water-boiler-alert"
+      },
+      "outside_temperature_aussenluftfuehler_vorhanden": {
+        "default": "mdi:thermometer-check"
       },
       "room_temperature_anforderung_raum_heizstufe_1": {
         "default": "mdi:radiator"
@@ -67,94 +70,42 @@
       "summer_bypass_function_sommerautomatik": {
         "default": "mdi:weather-sunny"
       },
-      "fans_anforderung_ventilatoren_durch_waermepumpe": {
-        "default": "mdi:fan"
+      "utility_lockout_evu_sperre_brauchwasser_aktiv": {
+        "default": "mdi:water-boiler-off"
       },
-      "fans_anforderung_ventilatoren_durch_zonenregelung": {
-        "default": "mdi:fan"
+      "utility_lockout_evu_sperre_elektroheizstab_aktiv": {
+        "default": "mdi:radiator-off"
       },
-      "heat_pump_wp_kontakt_evu": {
-        "default": "mdi:electric-switch"
+      "utility_lockout_evu_sperre_raumheizung_aktiv": {
+        "default": "mdi:radiator-off"
       },
-      "heat_pump_wp_relaiskontakt_ext": {
-        "default": "mdi:electric-switch"
+      "utility_lockout_evu_vorhanden": {
+        "default": "mdi:transmission-tower"
       },
-      "hot_water_ventilation_anforderung_disbalance_boilerueberwaermung": {
-        "default": "mdi:water-boiler-alert"
+      "ventilation_anforderung_abtauen": {
+        "default": "mdi:snowflake-melt"
       },
-      "hot_water_ventilation_anforderung_brauchwasserheizung_elektroheizstab": {
-        "default": "mdi:water-boiler"
+      "ventilation_anforderung_beschattung": {
+        "default": "mdi:blinds"
       },
-      "hot_water_ventilation_anforderung_brauchwasserheizung_waermepumpe": {
-        "default": "mdi:water-boiler"
-      },
-      "hot_water_heat_pump_wp_elektroheizstab_vorhanden": {
-        "default": "mdi:water-boiler"
+      "ventilation_anforderung_st3_ext": {
+        "default": "mdi:fan-plus"
+      }
+    },
+    "select": {
+      "ventilation_betriebsart": {
+        "default": "mdi:tune-variant"
       }
     },
     "sensor": {
-      "general_wochentag": {
-        "default": "mdi:calendar-week"
-      },
-      "general_time": {
-        "default": "mdi:clock-outline"
-      },
-      "general_send_date_time": {
-        "default": "mdi:clock-sync-outline"
-      },
-      "general_date": {
-        "default": "mdi:calendar"
-      },
-      "general_revisionstuer": {
-        "default": "mdi:door"
-      },
-      "outside_temperature_vereisungsschutz": {
-        "default": "mdi:snowflake-alert"
+      "carbon_dioxide_co2": {
+        "default": "mdi:molecule-co2"
       },
       "carbon_dioxide_co2_measurement": {
         "default": "mdi:molecule-co2"
       },
-      "carbon_dioxide_co2": {
-        "default": "mdi:molecule-co2"
-      },
       "coarse_dust_filter_grobstaubfilter_max_foerdervolume": {
         "default": "mdi:gauge"
-      },
-      "ventilation_absenkung_aktive_luefterstufe": {
-        "default": "mdi:fan"
-      },
-      "ventilation_aktive_luefterstufe": {
-        "default": "mdi:fan"
-      },
-      "ventilation_betriebsart": {
-        "default": "mdi:tune-variant"
-      },
-      "ventilation_beschattungsfunktion": {
-        "default": "mdi:blinds"
-      },
-      "ventilation_befoerderte_kubikmeter": {
-        "default": "mdi:gauge"
-      },
-      "ventilation_befoerderte_luftmenge_seit_filterwechsel": {
-        "default": "mdi:gauge"
-      },
-      "ventilation_soll_volumenstrom_abluft": {
-        "default": "mdi:gauge"
-      },
-      "ventilation_soll_volumenstrom_zuluft": {
-        "default": "mdi:gauge"
-      },
-      "ventilation_volumenstrombalance_zuluftabluft": {
-        "default": "mdi:scale-balance"
-      },
-      "summer_bypass_betriebsart_sommerautomatik": {
-        "default": "mdi:weather-sunny"
-      },
-      "fans_ist_ventilator_zuluft": {
-        "default": "mdi:fan"
-      },
-      "fans_ist_ventilator_abluft": {
-        "default": "mdi:fan"
       },
       "fans_drehzahl_abluftventilator": {
         "default": "mdi:fan"
@@ -162,11 +113,32 @@
       "fans_drehzahl_zuluftventilator": {
         "default": "mdi:fan"
       },
+      "fans_ist_ventilator_abluft": {
+        "default": "mdi:fan"
+      },
+      "fans_ist_ventilator_zuluft": {
+        "default": "mdi:fan"
+      },
       "fans_max_permissible_exhaust_air_fan_speed": {
         "default": "mdi:fan"
       },
       "fans_max_permissible_supply_air_fan_speed": {
         "default": "mdi:fan"
+      },
+      "general_date": {
+        "default": "mdi:calendar"
+      },
+      "general_revisionstuer": {
+        "default": "mdi:door"
+      },
+      "general_send_date_time": {
+        "default": "mdi:calendar-sync"
+      },
+      "general_time": {
+        "default": "mdi:clock-outline"
+      },
+      "general_wochentag": {
+        "default": "mdi:calendar-week"
       },
       "heat_pump_waermepumpe": {
         "default": "mdi:heat-pump"
@@ -186,24 +158,52 @@
       "hot_water_heat_pump_ueberschreitung_boilertemp": {
         "default": "mdi:thermometer-alert"
       },
+      "hot_water_heat_pump_wp_verzoegerung_brauchwasserheizung": {
+        "default": "mdi:timer-outline"
+      },
       "hot_water_heat_pump_wp_vorruebergehende_boilertemperatur": {
         "default": "mdi:thermometer-water"
       },
-      "hot_water_heat_pump_wp_verzoegerung_brauchwasserheizung": {
-        "default": "mdi:timer-outline"
+      "outside_temperature_vereisungsschutz": {
+        "default": "mdi:snowflake-alert"
+      },
+      "summer_bypass_betriebsart_sommerautomatik": {
+        "default": "mdi:weather-sunny"
+      },
+      "ventilation_absenkung_aktive_luefterstufe": {
+        "default": "mdi:fan"
+      },
+      "ventilation_aktive_luefterstufe": {
+        "default": "mdi:fan"
+      },
+      "ventilation_befoerderte_kubikmeter": {
+        "default": "mdi:gauge"
+      },
+      "ventilation_befoerderte_luftmenge_seit_filterwechsel": {
+        "default": "mdi:gauge"
+      },
+      "ventilation_beschattungsfunktion": {
+        "default": "mdi:blinds"
+      },
+      "ventilation_betriebsart": {
+        "default": "mdi:tune-variant"
+      },
+      "ventilation_soll_volumenstrom_abluft": {
+        "default": "mdi:gauge"
+      },
+      "ventilation_soll_volumenstrom_zuluft": {
+        "default": "mdi:gauge"
+      },
+      "ventilation_volumenstrombalance_zuluftabluft": {
+        "default": "mdi:scale-balance"
       }
     },
     "switch": {
-      "boost_functions_ventilation_function_heizung_plus": {
-        "default": "mdi:radiator"
-      },
       "boost_functions_heat_pump_function_bad_plus": {
         "default": "mdi:shower"
-      }
-    },
-    "select": {
-      "ventilation_betriebsart": {
-        "default": "mdi:tune-variant"
+      },
+      "boost_functions_ventilation_function_heizung_plus": {
+        "default": "mdi:radiator"
       }
     }
   }
