@@ -151,7 +151,7 @@ adguardhome==0.8.1
 advantage-air==0.4.4
 
 # homeassistant.components.aerosmart
-aerosmart-modbus==0.2.1
+aerosmart-modbus==0.3.0
 
 # homeassistant.components.frontier_silicon
 afsapi==1.0.1
@@ -1595,7 +1595,7 @@ mitsubishi-comfort==0.3.2
 moat-ble==0.1.1
 
 # homeassistant.components.modbus_connection
-modbus-connection[tmodbus]==3.4.1
+modbus-connection[tmodbus]==4.12.4
 
 # homeassistant.components.moehlenhoff_alpha2
 moehlenhoff-alpha2==1.4.0
