@@ -156,11 +156,28 @@ BINARY_SENSOR_DESCRIPTIONS: list[OverkizBinarySensorDescription] = [
         icon="mdi:angle-acute",
         value_fn=bool,
     ),
+    # Oven/DynamicOven
+    OverkizBinarySensorDescription(
+        key=OverkizState.CORE_OPEN,
+        name="Door",
+        device_class=BinarySensorDeviceClass.DOOR,
+        value_fn=bool,
+        device_types=[UIClass.OVEN],
+    ),
+    OverkizBinarySensorDescription(
+        key=OverkizState.CORE_TARGET_TEMPERATURE_REACHED,
+        name="Temperature reached",
+        value_fn=bool,
+        device_types=[UIClass.OVEN],
+    ),
 ]
 
 SUPPORTED_STATES = {
     description.key: description for description in BINARY_SENSOR_DESCRIPTIONS
 }
+
+
+PARALLEL_UPDATES = 0
 
 
 async def async_setup_entry(

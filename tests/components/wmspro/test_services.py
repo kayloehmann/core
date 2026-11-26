@@ -3,24 +3,22 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from pytest_homeassistant.common import MockConfigEntry
 
 from homeassistant.components.cover import (
     ATTR_CURRENT_POSITION,
     ATTR_CURRENT_TILT_POSITION,
-    ATTR_POSITION,
-    ATTR_TILT_POSITION,
 )
 from homeassistant.components.wmspro.const import (
     DOMAIN,
-    SERVICE_SET_COVER_POSITION_AND_TILT,
+    WebControlProService,
+    WebControlProServiceArgument,
 )
-from homeassistant.const import ATTR_ENTITY_ID, STATE_OPEN
+from homeassistant.const import STATE_OPEN, TargetKey
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
 
 from . import setup_config_entry
-
-from tests.common import MockConfigEntry
 
 
 @pytest.mark.parametrize(
@@ -39,9 +37,11 @@ async def test_set_cover_position_and_tilt_service_is_registered(
     assert await setup_config_entry(hass, mock_config_entry)
     assert len(mock_hub_ping.mock_calls) == 1
     assert len(mock_hub_configuration.mock_calls) == 1
-    assert len(mock_hub_status.mock_calls) >= 1
+    assert len(mock_hub_status.mock_calls) == len(mock_hub_configuration.destinations)
 
-    assert hass.services.has_service(DOMAIN, SERVICE_SET_COVER_POSITION_AND_TILT)
+    assert hass.services.has_service(
+        DOMAIN, WebControlProService.SET_COVER_POSITION_AND_TILT
+    )
 
 
 @pytest.mark.parametrize(
@@ -69,7 +69,7 @@ async def test_set_cover_position_and_tilt_service_executes(
     assert await setup_config_entry(hass, mock_config_entry)
     assert len(mock_hub_ping.mock_calls) == 1
     assert len(mock_hub_configuration.mock_calls) == 1
-    assert len(mock_hub_status.mock_calls) >= 1
+    assert len(mock_hub_status.mock_calls) == len(mock_hub_configuration.destinations)
 
     entity = hass.states.get(entity_id)
     assert entity is not None
@@ -86,11 +86,11 @@ async def test_set_cover_position_and_tilt_service_executes(
 
         await hass.services.async_call(
             DOMAIN,
-            SERVICE_SET_COVER_POSITION_AND_TILT,
+            WebControlProService.SET_COVER_POSITION_AND_TILT,
             {
-                ATTR_ENTITY_ID: entity.entity_id,
-                ATTR_POSITION: 30,
-                ATTR_TILT_POSITION: 80,
+                TargetKey.ENTITY_ID: entity.entity_id,
+                WebControlProServiceArgument.POSITION: 30,
+                WebControlProServiceArgument.TILT_POSITION: 80,
             },
             blocking=True,
         )
@@ -128,18 +128,18 @@ async def test_set_cover_position_and_tilt_unsupported_entity_raises(
     assert await setup_config_entry(hass, mock_config_entry)
     assert len(mock_hub_ping.mock_calls) == 1
     assert len(mock_hub_configuration.mock_calls) == 1
-    assert len(mock_hub_status.mock_calls) >= 1
+    assert len(mock_hub_status.mock_calls) == len(mock_hub_configuration.destinations)
 
     before = len(mock_hub_status.mock_calls)
 
     with pytest.raises(ServiceValidationError):
         await hass.services.async_call(
             DOMAIN,
-            SERVICE_SET_COVER_POSITION_AND_TILT,
+            WebControlProService.SET_COVER_POSITION_AND_TILT,
             {
-                ATTR_ENTITY_ID: entity_id,
-                ATTR_POSITION: 30,
-                ATTR_TILT_POSITION: 80,
+                TargetKey.ENTITY_ID: entity_id,
+                WebControlProServiceArgument.POSITION: 30,
+                WebControlProServiceArgument.TILT_POSITION: 80,
             },
             blocking=True,
         )

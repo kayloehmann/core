@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: test_basic_controller_properties[climate.izone_controller_000000001-entry]
+# name: test_climate_entities[climate.izone_controller_000000001-entry]
   EntityRegistryEntrySnapshot({
     'aliases': list([
       None,
@@ -23,11 +23,12 @@
       <ClimateEntityCapabilityAttribute.MAX_TEMP: 'max_temp'>: 30.0,
       <ClimateEntityCapabilityAttribute.MIN_TEMP: 'min_temp'>: 15.0,
       <ClimateEntityCapabilityAttribute.TARGET_TEMP_STEP: 'target_temp_step'>: 0.5,
+      <ClimateEntityCapabilityAttribute.TEMPERATURE_UNIT: 'temperature_unit'>: <UnitOfTemperature.CELSIUS: '°C'>,
     }),
     'config_entry_id': <ANY>,
-    'config_subentry_id': <ANY>,
+    'config_subentry_id': None,
     'device_class': None,
-    'device_id': <ANY>,
+    'device_id': <DeviceEntry identifiers=[('izone', '000000001')]>,
     'disabled_by': None,
     'domain': 'climate',
     'entity_category': None,
@@ -54,7 +55,7 @@
     'unit_of_measurement': None,
   })
 # ---
-# name: test_basic_controller_properties[climate.izone_controller_000000001-state]
+# name: test_climate_entities[climate.izone_controller_000000001-state]
   StateSnapshot({
     'attributes': ReadOnlyDict({
       'control_zone': 1,
@@ -83,6 +84,7 @@
       <EntityStateAttribute.SUPPORTED_FEATURES: 'supported_features'>: <ClimateEntityFeature: 392>,
       <ClimateEntityCapabilityAttribute.TARGET_TEMP_STEP: 'target_temp_step'>: 0.5,
       'temp_setpoint': 24.0,
+      <ClimateEntityCapabilityAttribute.TEMPERATURE_UNIT: 'temperature_unit'>: <UnitOfTemperature.CELSIUS: '°C'>,
     }),
     'context': <ANY>,
     'entity_id': 'climate.izone_controller_000000001',
@@ -92,7 +94,7 @@
     'state': 'cool',
   })
 # ---
-# name: test_basic_controller_properties[climate.living_room-entry]
+# name: test_climate_entities[climate.living_room-entry]
   EntityRegistryEntrySnapshot({
     'aliases': list([
       None,
@@ -107,11 +109,12 @@
       <ClimateEntityCapabilityAttribute.MAX_TEMP: 'max_temp'>: 30.0,
       <ClimateEntityCapabilityAttribute.MIN_TEMP: 'min_temp'>: 15.0,
       <ClimateEntityCapabilityAttribute.TARGET_TEMP_STEP: 'target_temp_step'>: 0.5,
+      <ClimateEntityCapabilityAttribute.TEMPERATURE_UNIT: 'temperature_unit'>: <UnitOfTemperature.CELSIUS: '°C'>,
     }),
     'config_entry_id': <ANY>,
-    'config_subentry_id': <ANY>,
+    'config_subentry_id': None,
     'device_class': None,
-    'device_id': <ANY>,
+    'device_id': <DeviceEntry identifiers=[('izone', '000000001', 0)]>,
     'disabled_by': None,
     'domain': 'climate',
     'entity_category': None,
@@ -138,7 +141,7 @@
     'unit_of_measurement': None,
   })
 # ---
-# name: test_basic_controller_properties[climate.living_room-state]
+# name: test_climate_entities[climate.living_room-state]
   StateSnapshot({
     'attributes': ReadOnlyDict({
       'airflow_max': 100,
@@ -154,7 +157,8 @@
       <ClimateEntityCapabilityAttribute.MIN_TEMP: 'min_temp'>: 15.0,
       <EntityStateAttribute.SUPPORTED_FEATURES: 'supported_features'>: <ClimateEntityFeature: 385>,
       <ClimateEntityCapabilityAttribute.TARGET_TEMP_STEP: 'target_temp_step'>: 0.5,
-      <ClimateEntityStateAttribute.TEMPERATURE: 'temperature'>: 24.0,
+      <ClimateEntityStateAttribute.TARGET_TEMPERATURE: 'temperature'>: 24.0,
+      <ClimateEntityCapabilityAttribute.TEMPERATURE_UNIT: 'temperature_unit'>: <UnitOfTemperature.CELSIUS: '°C'>,
       'zone_index': 0,
     }),
     'context': <ANY>,
